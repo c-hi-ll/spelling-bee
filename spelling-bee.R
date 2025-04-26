@@ -21,8 +21,8 @@ validwordcount <- 0
 pangramcount <- 0
 i <- 1
 
+# sample letters
 while (validwordcount < 10 | pangramcount == 0) {
-  print(paste0('i =  ', i))
   # select 7 random letters and pick one as the middle letter
   # make sure at least one is a vowel
   vowel <- sample(c('a', 'e', 'i', 'o', 'u'), 1)
@@ -31,9 +31,8 @@ while (validwordcount < 10 | pangramcount == 0) {
   
   # create list of possible words
   solutionlist <- validwords %>%
-    filter(valid) %>%
     filter(grepl(middle, word)) %>%
-    filter(sum(!(str_split_1(word, '') %in% letterlist)) == 0) 
+    filter(all(str_split_1(word, '') %in% letterlist)) 
   
   validwordcount <- nrow(solutionlist)
   pangramcount <- sum(solutionlist$pangram)
@@ -41,3 +40,11 @@ while (validwordcount < 10 | pangramcount == 0) {
   print(pangramcount)
   i <- i + 1
 }
+
+# set scoring
+solutionlist <- solutionlist %>%
+  mutate(score = case_when(pangram    ~ 7 + nchar,
+                           nchar == 4 ~ 1,
+                           nchar > 4  ~ nchar))
+
+maxscore <- sum(solutionlist$score)
