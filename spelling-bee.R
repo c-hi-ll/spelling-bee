@@ -53,7 +53,7 @@ gameend <- F
 letterlist_display <- toupper(c(letterlist[letterlist != middle][1:3],
                                 paste0('[', middle, ']'),
                                 letterlist[letterlist != middle][4:6]))
-                        
+
 
 while (!gameend) {
   cat(letterlist_display, '\n')
@@ -64,14 +64,47 @@ while (!gameend) {
   # end game
   if (input == 'stop') {
     gameend <- T
+  } else {
+    
+    # checks
+    chk_middle   <- grepl(middle, input)
+    chk_length   <- nchar(input) >= 4
+    chk_letters  <- all(str_split_1(input, '') %in% letterlist)
+    chk_word     <- input %in% allwords$word
+    chk_solution <- input %in% solutionlist$word
+    chk_pangram  <- input %in% solutionlist$word[solutionlist$pangram]
+    
+    # produce output
+    if (chk_solution) {
+      points <- solutionlist$score[solutionlist$word == input]
+      currentscore <- currentscore + points
+      if (chk_pangram) {
+        cat('PANGRAM!', points, ifelse(points > 1,
+                                       'points!\n',
+                                       'point!\n'),
+            '________\n')
+      } else {
+        cat(points, ifelse(points > 1,
+                           'points!\n',
+                           'point!\n'),
+            '________\n')
+      }
+      
+    } else {
+      if (!chk_word) {
+        cat('Not a valid word\n' )
+      } else {
+        if (!chk_letters) {
+          cat('Uses letters not on list\n')
+        }
+        if (!chk_middle) {
+          cat("Doesn't use middle letter\n")
+        }
+        if (!chk_length) {
+          cat('Too short\n')
+        }
+      }
+      cat('________\n')
+    }
   }
-  
-  # checks
-  chk_middle   <- grepl(middle, input)
-  chk_length   <- nchar(input) >= 4
-  chk_letters  <- all(str_split_1(input, '') %in% letterlist)
-  chk_word     <- input %in% allwords$word
-  chk_solution <- input %in% solutionlist$word
-  chk_pangram  <- input %in% solutionlist$word[solutionlist$pangram]
-
 }
