@@ -60,10 +60,10 @@ solutionlist <- solutionlist %>%
 maxscore <- sum(solutionlist$score)
 maxscore_common <- sum(solutionlist$score[solutionlist$common])
 
-
 # set up interactive prompting
 currentscore <- 0
 gameend <- F
+guessed <- c()
 letterlist_display <- toupper(c(letterlist[letterlist != middle][1:3],
                                 paste0('[', middle, ']'),
                                 letterlist[letterlist != middle][4:6]))
@@ -87,11 +87,14 @@ while (!gameend) {
     chk_word     <- input %in% allwords$word
     chk_solution <- input %in% solutionlist$word
     chk_pangram  <- input %in% solutionlist$word[solutionlist$pangram]
+    chk_guessed  <- input %in% guessed
     
     # produce output
     if (chk_solution) {
+      if (!chk_guessed) {
       points <- solutionlist$score[solutionlist$word == input]
       currentscore <- currentscore + points
+      guessed <- c(guessed, input)
       if (chk_pangram) {
         cat('PANGRAM!', points, ifelse(points > 1,
                                        'points!\n',
@@ -101,6 +104,10 @@ while (!gameend) {
         cat(points, ifelse(points > 1,
                            'points!\n',
                            'point!\n'),
+            '________\n')
+      }
+      } else {
+        cat('Already guessed\n',
             '________\n')
       }
       
