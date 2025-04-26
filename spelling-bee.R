@@ -36,8 +36,6 @@ while (validwordcount < 10 | pangramcount == 0) {
   
   validwordcount <- nrow(solutionlist)
   pangramcount <- sum(solutionlist$pangram)
-  print(validwordcount)
-  print(pangramcount)
   i <- i + 1
 }
 
@@ -48,3 +46,32 @@ solutionlist <- solutionlist %>%
                            nchar > 4  ~ nchar))
 
 maxscore <- sum(solutionlist$score)
+
+# set up interactive prompting
+currentscore <- 0
+gameend <- F
+letterlist_display <- toupper(c(letterlist[letterlist != middle][1:3],
+                                paste0('[', middle, ']'),
+                                letterlist[letterlist != middle][4:6]))
+                        
+
+while (!gameend) {
+  cat(letterlist_display, '\n')
+  cat('Current score: ', currentscore, '\n')
+  cat('Enter "stop" to end the game. \n')
+  input <- tolower(readline('Your guess: '))
+  
+  # end game
+  if (input == 'stop') {
+    gameend <- T
+  }
+  
+  # checks
+  chk_middle   <- grepl(middle, input)
+  chk_length   <- nchar(input) >= 4
+  chk_letters  <- all(str_split_1(input, '') %in% letterlist)
+  chk_word     <- input %in% allwords$word
+  chk_solution <- input %in% solutionlist$word
+  chk_pangram  <- input %in% solutionlist$word[solutionlist$pangram]
+
+}
