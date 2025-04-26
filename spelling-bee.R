@@ -13,6 +13,18 @@ allwords <- read.delim('~/Documents/spelling-bee/words_alpha.txt',
          # create subset of words that are pangrams
          pangram = unique_char == 7)
 
+
+# add in flag for common words (top 20,000)
+commonwords <- read.delim('~/Documents/spelling-bee/top_english_words_lower_50000.txt',
+                          header = F,
+                          col.names = 'word') %>%
+  mutate(common = T)
+
+allwords <- allwords %>%
+  left_join(commonwords, by = 'word') %>%
+  mutate(common = ifelse(is.na(common), F, common))
+
+# filter to only valid words for this game
 validwords <- allwords %>%
   filter(valid)
 
@@ -46,6 +58,8 @@ solutionlist <- solutionlist %>%
                            nchar > 4  ~ nchar))
 
 maxscore <- sum(solutionlist$score)
+maxscore_common <- sum(solutionlist$score[solutionlist$common])
+
 
 # set up interactive prompting
 currentscore <- 0
