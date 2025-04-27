@@ -60,6 +60,20 @@ solutionlist <- solutionlist %>%
 maxscore <- sum(solutionlist$score)
 maxscore_common <- sum(solutionlist$score[solutionlist$common])
 
+ranklist <- data.frame(rank = c('Beginner', 'Good Start', 'Moving Up', 'Good',
+                                'Solid', 'Nice', 'Great', 'Amazing',
+                                'Genius', 'Queen Bee'),
+                       threshold = c(0, 
+                                     round(maxscore_common * .02),
+                                     round(maxscore_common * .05),
+                                     round(maxscore_common * .08),
+                                     round(maxscore_common * .15),
+                                     round(maxscore_common * .25),
+                                     round(maxscore_common * .40),
+                                     round(maxscore_common * .50),
+                                     round(maxscore_common * .70),
+                                     maxscore_common))
+
 # set up interactive prompting
 currentscore <- 0
 gameend <- F
@@ -70,8 +84,30 @@ letterlist_display <- toupper(c(letterlist[letterlist != middle][1:3],
 
 
 while (!gameend) {
+  
+  rank <- ranklist %>%
+    filter(threshold <= currentscore) %>%
+    slice_tail(n = 1) %>%
+    pull(rank)
+  
+  points_to_next <- (ranklist %>%
+    filter(threshold > currentscore) %>%
+    slice_head(n = 1) %>%
+    pull(threshold)) - currentscore
+  
+  rank_next <- ranklist %>%
+    filter(threshold > currentscore) %>%
+    slice_head(n = 1) %>%
+    pull(rank)
+  
+  
   cat(letterlist_display, '\n')
-  cat('Current score: ', currentscore, '\n')
+  cat('Current score: ', currentscore, paste0('(', rank, ')'), '\n')
+  cat(points_to_next,
+      ifelse(points_to_next > 1, 
+                             'points to reach',
+                             'point to reach'),
+      rank_next, '\n')
   cat('Enter "stop" to end the game. \n')
   input <- tolower(readline('Your guess: '))
   
