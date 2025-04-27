@@ -91,9 +91,9 @@ while (!gameend) {
     pull(rank)
   
   points_to_next <- (ranklist %>%
-    filter(threshold > currentscore) %>%
-    slice_head(n = 1) %>%
-    pull(threshold)) - currentscore
+                       filter(threshold > currentscore) %>%
+                       slice_head(n = 1) %>%
+                       pull(threshold)) - currentscore
   
   rank_next <- ranklist %>%
     filter(threshold > currentscore) %>%
@@ -105,15 +105,18 @@ while (!gameend) {
   cat('Current score: ', currentscore, paste0('(', rank, ')'), '\n')
   cat(points_to_next,
       ifelse(points_to_next > 1, 
-                             'points to reach',
-                             'point to reach'),
+             'points to reach',
+             'point to reach'),
       rank_next, '\n')
-  cat('Enter "stop" to end the game. \n')
+  cat('Enter "1" to end the game, "2" to see previous guesses. \n')
   input <- tolower(readline('Your guess: '))
   
   # end game
-  if (input == 'stop') {
+  if (input == '1') {
     gameend <- T
+  } else if (input == '2') {
+    cat(sort(guessed), '\n',
+        '________\n')
   } else {
     
     # checks
@@ -128,20 +131,20 @@ while (!gameend) {
     # produce output
     if (chk_solution) {
       if (!chk_guessed) {
-      points <- solutionlist$score[solutionlist$word == input]
-      currentscore <- currentscore + points
-      guessed <- c(guessed, input)
-      if (chk_pangram) {
-        cat('PANGRAM!', points, ifelse(points > 1,
-                                       'points!\n',
-                                       'point!\n'),
-            '________\n')
-      } else {
-        cat(points, ifelse(points > 1,
-                           'points!\n',
-                           'point!\n'),
-            '________\n')
-      }
+        points <- solutionlist$score[solutionlist$word == input]
+        currentscore <- currentscore + points
+        guessed <- c(guessed, input)
+        if (chk_pangram) {
+          cat('PANGRAM!', points, ifelse(points > 1,
+                                         'points!\n',
+                                         'point!\n'),
+              '________\n')
+        } else {
+          cat(points, ifelse(points > 1,
+                             'points!\n',
+                             'point!\n'),
+              '________\n')
+        }
       } else {
         cat('Already guessed\n',
             '________\n')
